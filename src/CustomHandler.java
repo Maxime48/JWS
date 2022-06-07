@@ -3,6 +3,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 
 public class CustomHandler implements HttpHandler {
 
@@ -11,9 +12,11 @@ public class CustomHandler implements HttpHandler {
 
         String query = exchange.getRequestURI().getQuery();
 
-        String response = "<b>Bonjour !</b></br>" +
-                          "Méthode : " + requestMethod + "</br>"
-                        + "Requête : " + query;
+        URI ops = exchange.getRequestURI();
+
+        String response = "<b>Bonjour !</b></br>" + ops.getPath();
+
+
         exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
         exchange.sendResponseHeaders(200, response.getBytes().length);
         OutputStream os = exchange.getResponseBody();
