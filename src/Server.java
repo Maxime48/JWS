@@ -1,6 +1,12 @@
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,8 +14,8 @@ import java.net.InetSocketAddress;
 public class Server{
 
     private Integer port;
-    private String root;
 
+    public static String root;
     public static Boolean index;
     public static String accept;
     public static String reject;
@@ -17,7 +23,44 @@ public class Server{
 
     public Server() {
         try {
-            //Set params there
+            //creating a constructor of file class and parsing an XML file
+            File file = new File("config.xml");
+            //an instance of factory that gives a document builder
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            //an instance of builder to parse the specified xml file
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(file);
+            doc.getDocumentElement().normalize();
+
+            NodeList elm = doc.getElementsByTagName("webconf");
+                Node node = elm.item(0);
+                for(int i = 1; i<node.getChildNodes().getLength(); i++){
+                    String parameterName = node.getChildNodes().item(i).getNodeName()
+                            .replaceAll("[\\n\\r\\s]+", "");
+                    if(!parameterName.equals("#text")){
+                        String content = node.getChildNodes().item(i).getTextContent()
+                                .replaceAll("[\\n\\r\\s]+", "");
+
+                        System.out.println(parameterName + ": " + content);
+
+                        if(parameterName.equals("port")){
+                            this.port = Integer.parseInt(content);
+                        }
+                        if(parameterName.equals("root")){
+                            Server.root = content;
+                        }
+                        if(parameterName.equals("index")){
+                            Server.index = Boolean.parseBoolean(content);
+                        }
+                        if(parameterName.equals("accept")){
+                            Server.accept = content;
+                        }
+                        if(parameterName.equals("reject")){
+                            Server.reject = content;
+                        }
+                    }
+                }
+
         } catch (Exception e) {
             System.out.println("Default parameters have been set due to the following error: ");
             e.printStackTrace();
@@ -30,8 +73,8 @@ public class Server{
     }
 
     public static void main(String[] args) throws IOException {
-
-        HttpServer server = HttpServer.create(new InetSocketAddress(8500), 0);
+        Server conf = new Server();
+        HttpServer server = HttpServer.create(new InetSocketAddress(conf.port), 0);
         HttpContext context = server.createContext("/");
         context.setHandler(new CustomHandler());
         server.start();
