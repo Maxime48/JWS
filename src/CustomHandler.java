@@ -16,8 +16,22 @@ public class CustomHandler implements HttpHandler {
 
         URI ops = exchange.getRequestURI();
 
+
         //handling extensions and filetype
         String uri = ops.getPath();
+            //Test if this a directory and display index or not
+            String file = Server.root + ops.getPath();
+            if(
+                    Files.isDirectory(Path.of(file))  //Does the file exists
+            ){ //if not
+                if(!Server.index){//is index set to false
+                    //Display the index
+                    String index = ( ops.getPath().endsWith("/") ) ?
+                                    "index.html" : "/index.html";
+                    file = file + index;
+                    uri = ops.getPath()+index;
+                }//else display file/folder list
+            }
         String extension = (uri.contains(".")) ? uri.substring(uri.lastIndexOf(".") + 1) : "";
         if (extension.equals("js")) {
             extension = "javascript";
@@ -28,17 +42,20 @@ public class CustomHandler implements HttpHandler {
         }
 
         //reading requested file
-        String response;
+        String response = null;
         byte[] imageBytes = new byte[0];
         if (filetype.equals("image")) {
-            imageBytes = Files.readAllBytes(Path.of(Server.root + ops.getPath()));
-            response = new String(imageBytes);
+            imageBytes = Files.readAllBytes(Path.of(file));
         } else {
+
             BufferedReader BufferedfileReader = new BufferedReader(
-                    new FileReader(Server.root + ops.getPath())
+                    new FileReader(file)
             );
             response = BufferedfileReader.lines().collect(Collectors.joining());
+
         }
+
+
 
         //Headers
         exchange.getResponseHeaders().set(
