@@ -1,7 +1,6 @@
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -66,7 +65,7 @@ public class Server{
             e.printStackTrace();
         }
         this.port = (this.port == null) ? 80 : this.port;
-        this.root = (this.root == null) ? "/" : this.root;
+        Server.root = (Server.root == null) ? "/" : Server.root;
         Server.index = Server.index != null && Server.index;
         Server.accept = (Server.accept == null) ? "" : Server.accept;
         Server.reject = (Server.reject == null) ? "" : Server.reject;
