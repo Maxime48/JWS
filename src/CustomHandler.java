@@ -149,19 +149,26 @@ public class CustomHandler implements HttpHandler {
             if (filetype.equals("image")) {
                 imageBytes = Files.readAllBytes(Path.of(file));
             } else {
-
-                BufferedReader BufferedfileReader = new BufferedReader(
-                        new FileReader(file)
-                );
-                response = BufferedfileReader.lines().collect(Collectors.joining());
-
+                try {
+                    BufferedReader BufferedfileReader = new BufferedReader(
+                            new FileReader(file)
+                    );
+                    response = BufferedfileReader.lines().collect(Collectors.joining());
+                }catch(IOException ignored){}
             }
         }
 
         if(responseCode == 403){
             filetype = "text";
             extension = "html";
-            response = "Unauthorized access";
+            response = "403 - Unauthorized access";
+        }
+
+        if(response == null && imageBytes.length == 0){
+            responseCode = 404;
+            filetype = "text";
+            extension = "html";
+            response = "404 - Page not found";
         }
 
         //Headers
