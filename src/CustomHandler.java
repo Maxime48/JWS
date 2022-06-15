@@ -66,7 +66,7 @@ public class CustomHandler implements HttpHandler {
         int responseCode = 200;
 
         String ClientAdress = exchange.getRemoteAddress().getAddress().getHostAddress(); //extracting remote adress
-        if(!Objects.equals(ClientAdress, "0:0:0:0:0:0:0:1")) {
+        if(!Objects.equals(ClientAdress, "0:0:0:0:0:0:0:1") && !Objects.equals(ClientAdress, "127.0.0.1")) {
             ArrayList<String> BinaryClientAdress = CustomHandler.addressTobinary(ClientAdress);
 
             if (!Objects.equals(Server.accept, "")) {
